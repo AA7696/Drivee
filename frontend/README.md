@@ -1,12 +1,52 @@
-# React + Vite
+# 🚗 Drivee - Vehicle Rental Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Drivee is a modern and user-friendly vehicle rental platform where users can browse, book, and pay for cars and bikes online. It includes features for both customers and vehicle owners (admins) to manage bookings, view rental history, and handle fleet operations efficiently.
 
-Currently, two official plugins are available:
+## 🌐 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+👉 [View Live](https://drivee-azure.vercel.app)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## ✨ Features
+
+### 🚘 Customer Features
+- User authentication (Google login)
+- Browse vehicles by location, type, fuel, and transmission
+- View detailed vehicle info and availability
+- Book vehicles by selecting pick-up and drop-off date/time
+- Get real-time price calculation
+- Secure payment with Razorpay
+- View booking history
+
+### 🧑‍💼 Admin/Owner Features
+- Admin login
+- Add new vehicles with specs and image
+- Manage existing cars (edit/delete)
+- Manage bookings (view & cancel)
+- View payment status (paid/pending)
+
+---
+
+## 🛠 Tech Stack
+
+| Frontend       | Backend         | Database        | Auth & Storage     | Tools & Libs               |
+|----------------|-----------------|-----------------|--------------------|----------------------------|
+| React.js       | Firebase SDK    | Firestore       | Firebase Auth      | Zustand, React Query       |
+| Tailwind CSS   | Vercel Hosting|                 | Firebase Storage   | React Router, Toast, Razorpay |
+
+---
+
+## 🧑‍💻 How to Use
+
+### 🔧 Local Setup
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/your-username/drivee.git
+   cd drivee
+   .env - VITE_RAZORPAY_KEY=rzp_test_fkg78ERTx3otk8
+   npm i
+   npm run dev
+   
