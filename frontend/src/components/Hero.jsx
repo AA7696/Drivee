@@ -3,14 +3,52 @@ import Navbar from './Navbar';
 import { useNavigate } from 'react-router-dom';
 import { useFilterStore } from '../store/useFilterStore';
 import bg from '../assets/bg.jpg'
+import useAuthStore from '../store/useAuthStore';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider , db } from '../firebase/firbaseConfig.js';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import toast from 'react-hot-toast';
+
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const { type, fuel, location, transmission, setFilters } = useFilterStore();
+  const { user } = useAuthStore();
 
   const handleFilterChange = (key, value) => {
     setFilters({ [key]: value });
   };
+
+  const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // Check if user exists in Firestore
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        uid: user.uid,
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        createdAt: new Date().toISOString(),
+        role: 'user' 
+      });
+    }
+
+    toast.success("Logged in successfully!");
+    navigate('/rent');
+  } catch (error) {
+    toast.error("Login failed. Please try again.");
+    console.error('Google login error:', error.message);
+  }
+};
+
+
+
 
   return (
     <div
@@ -30,13 +68,33 @@ const HeroSection = () => {
         <p className="text-gray-300 text-sm sm:text-base max-w-2xl mb-6">
           To contribute to positive change and achieve our sustainability goals with many extraordinary vehicles.
         </p>
-        <button
-          onClick={() => navigate('/rent')}
-          className="bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500
+        {
+          !user ? (
+            <>
+              <button
+                onClick={handleGoogleLogin}
+                className="bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500
               px-8 py-3 rounded-full text-white font-medium shadow-lg transition-all duration-300"
-        >
-          Rent Your Vehicle
-        </button>
+              >
+                Sign Up
+              </button>
+
+            </>
+          ) :
+            (
+              <>
+                <button
+                  onClick={() => navigate('/rent')}
+                  className="bg-gradient-to-r from-orange-500 to-yellow-400 hover:from-orange-600 hover:to-yellow-500
+              px-8 py-3 rounded-full text-white font-medium shadow-lg transition-all duration-300"
+                >
+                  Rent Your Vehicle
+                </button>
+
+              </>
+            )
+        }
+
       </div>
 
       {/* Filter Form */}

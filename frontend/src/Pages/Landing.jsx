@@ -8,11 +8,14 @@ import Footer from '../components/Footer'
 function Landing() {
   return (
     <>
+    <div className=' w-screen min-h-screen overflow-x-hidden'>
     <HeroSection />
     <Services />
     <Testimonials />
     <Locations />
     <Footer />
+
+    </div>
 
     </>
   )
