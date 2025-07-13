@@ -26,7 +26,7 @@ const Vehicle = ({ item }) => {
         <button
         disabled={!item.isAvailable}
           onClick={() => navigate(`/vehicle/${item.id}`)}
-          className={`${item.isAvailable? `bg-black cursor-pointer`: `bg-gray-500 cursor-not-allowed`} text-white px-4 py-2 rounded`}>Rent </button>
+          className={`${item.isAvailable? `bg-black text-white cursor-pointer`: `bg-gray-500 text-black cursor-not-allowed`} text-white px-4 py-2 rounded`}>Rent </button>
       </div>
     </div>
   );

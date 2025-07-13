@@ -6,7 +6,7 @@ import { Youtube } from 'lucide-react';
 
 export default function Footer() {
     return (
-      <footer className=" text-white py-8 border-t-2 border-white/15">
+      <footer className=" text-white py-8 border-t-2 border-white/15 bg-black">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8">
           {/* Left Section */}
           <div>
