@@ -8,12 +8,14 @@ import { db, auth } from '../firebase/firbaseConfig';
 import Loading from '../components/Loading';
 import Navbar from '../components/Navbar';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CheckoutPage = () => {
   const { bookingId } = useParams();
   const { data: booking, isLoading } = useBookingById(bookingId);
   const { data: vehicle } = useVehicleById(booking?.vehicleId);
   const [isPaying, setIsPaying] = useState(false);
+  const navigate = useNavigate();
 
   if (isLoading || !vehicle) return <Loading />;
 
@@ -46,7 +48,8 @@ const CheckoutPage = () => {
             razorpayPaymentId: response.razorpay_payment_id,
           });
           toast.success('Payment successful!');
-          window.location.href = '/my-booking';
+          navigate('/my-booking');
+          
         } catch (err) {
           toast.error('Failed to update payment status');
           console.error('Razorpay payment update error:', err);
