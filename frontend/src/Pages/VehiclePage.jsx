@@ -72,7 +72,7 @@ const VehiclePage = () => {
 
     };
 
-    const nowISO = new Date().toISOString().slice(0, 16); // 'YYYY-MM-DDTHH:MM'
+    const nowISO = new Date().toISOString().slice(0, 16); 
 
 
     return (
@@ -154,20 +154,19 @@ const VehiclePage = () => {
                                 onChange={(e) => setDropoffDate(e.target.value)}
                             />
 
-                            <div className="flex justify-between items-center mb-4">
-                                <span className="">Duration</span>
-                                <span className="font-semibold">
-                                    {booking?.duration ? `${booking.duration} Hours` : '--'}
-                                </span>
-                            </div>
+                            {pickupDate && dropoffDate && booking?.duration && (
+                                <div className="flex justify-between items-center mb-4">
+                                    <span>Duration</span>
+                                    <span className="font-semibold">{booking.duration} Hours</span>
+                                </div>
+                            )}
 
-                            <div className="flex justify-between items-center mb-6">
-                                <span className="">Total</span>
-                                <span className="text-lg font-bold">
-                                    ₹{booking?.total ? booking.total : '--'}
-                                </span>
-                            </div>
-
+                            {pickupDate && dropoffDate && booking?.total && (
+                                <div className="flex justify-between items-center mb-6">
+                                    <span>Total</span>
+                                    <span className="text-lg font-bold">₹{booking.total}</span>
+                                </div>
+                            )}
                             <button className=" btn w-full py-2 rounded  transition"
                                 disabled={isPending}
                                 onClick={handleBooking}

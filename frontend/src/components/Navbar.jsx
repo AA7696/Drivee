@@ -15,6 +15,9 @@ const Navbar = () => {
   const dropdownRef = useRef();
   const { user, logout } = useAuthStore();
 
+  console.log(user.photoURL);
+  
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -130,9 +133,9 @@ const handleGoogleLogin = async () => {
               </>
             ) : (<></>)}
             <img
-              src={user.photoURL || profile}
+              src={user?.photoURL || profile}
               onClick={() => setShowDropdown(!showDropdown)}
-              className="w-10 h-10 rounded-full border cursor-pointer"
+              className="w-10 h-10 rounded-full border cursor-pointer object-cover"
               alt="profile"
             />
             {showDropdown && (
