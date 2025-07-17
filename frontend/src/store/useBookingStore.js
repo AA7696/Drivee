@@ -1,6 +1,7 @@
 // src/store/useBookingStore.js
 import { create } from 'zustand';
 
+
 export const useBookingStore = create((set) => ({
   booking: {
     location: '',
@@ -10,7 +11,9 @@ export const useBookingStore = create((set) => ({
     total: 0,
     vehicleId: '',
     userId: '',
-    paymentStatus: 'pending'
+    paymentStatus: 'pending',
+    given: false,
+    returned: false,
   },
   setBooking: (data) => set((state) => ({
     booking: { ...state.booking, ...data }
@@ -24,6 +27,9 @@ export const useBookingStore = create((set) => ({
       total: 0,
       vehicleId: '',
       userId: '',
+      paymentStatus: 'pending',
+      given: false,
+      returned: false,
     }
   }),
 }));

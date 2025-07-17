@@ -1,4 +1,3 @@
-// src/hooks/useVehicleById.js
 import { useQuery } from '@tanstack/react-query';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firbaseConfig';

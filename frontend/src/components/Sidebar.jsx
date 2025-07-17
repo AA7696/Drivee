@@ -1,15 +1,16 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import profile from '../assets/profile.png'
+import {CarFront, LayoutDashboard, Plus, NotebookText} from 'lucide-react'
 
 function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
 
   const navItems = [
-    { name: 'Dashboard', path: '/owner', icon: '🔮' },
-    { name: 'Add Car', path: '/owner/add-car', icon: '➕' },
-    { name: 'Manage Cars', path: '/owner/manage-cars', icon: '🚗' },
-    { name: 'Manage Bookings', path: '/owner/manage-bookings', icon: '📄' },
+    { name: 'Dashboard', path: '/owner', icon: <LayoutDashboard /> },
+    { name: 'Add Vehicle', path: '/owner/add-car', icon: <Plus /> },
+    { name: 'Manage Vehicle', path: '/owner/manage-cars', icon: <CarFront /> },
+    { name: 'Manage Bookings', path: '/owner/manage-bookings', icon: <NotebookText /> },
   ];
 
   return (

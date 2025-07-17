@@ -1,4 +1,3 @@
-// src/hooks/useFilteredVehiclesOnMount.js
 import { useEffect, useState } from 'react';
 import { useFilterStore } from '../store/useFilterStore';
 

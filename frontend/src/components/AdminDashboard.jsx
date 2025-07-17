@@ -1,98 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { db } from '../firebase/firbaseConfig';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  limit,
-  doc,
-  getDoc,
-} from 'firebase/firestore';
+import React from 'react';
 import { FaCar, FaClipboardList, FaExclamationTriangle } from 'react-icons/fa';
+import { useTotalVehicles } from '../hooks/useTotalVehicles';
+import { useBookingStats } from '../hooks/useBookingStats';
+import { useRecentBookings } from '../hooks/useRecentBookings';
 
 const AdminDashboard = () => {
-  const [totalCars, setTotalCars] = useState(0);
-  const [totalBookings, setTotalBookings] = useState(0);
-  const [pendingBookings, setPendingBookings] = useState(0);
-  const [confirmedBookings, setConfirmedBookings] = useState(0);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [recentBookings, setRecentBookings] = useState([]);
+  const { data: totalVehicles, isLoading: loadingVehicles } = useTotalVehicles();
+  const { data: stats, isLoading: loadingStats } = useBookingStats();
+  const { data: recentBookings = [], isLoading: loadingRecent } = useRecentBookings();
 
-  const fetchDashboardStats = async () => {
-    const carSnap = await getDocs(collection(db, 'vehicles'));
-    setTotalCars(carSnap.size);
-
-    const bookingSnap = await getDocs(collection(db, 'bookings'));
-    setTotalBookings(bookingSnap.size);
-
-    const pendingSnap = await getDocs(
-      query(collection(db, 'bookings'), where('paymentStatus', '==', 'pending'))
-    );
-    setPendingBookings(pendingSnap.size);
-
-    const confirmedSnap = await getDocs(
-      query(collection(db, 'bookings'), where('paymentStatus', '==', 'paid'))
-    );
-    setConfirmedBookings(confirmedSnap.size);
-
-    // 💰 Total Revenue
-    let total = 0;
-    confirmedSnap.forEach((doc) => {
-      const data = doc.data();
-      total += data.total || 0;
-    });
-    setTotalRevenue(total);
-
-    // 📦 Recent Bookings (with user names)
-    const latestBookingsSnap = await getDocs(
-      query(collection(db, 'bookings'), orderBy('pickupDate', 'desc'), limit(5))
-    );
-
-    const latestBookingsWithUser = await Promise.all(
-      latestBookingsSnap.docs.map(async (docSnap) => {
-        const booking = docSnap.data();
-        let vehicleName = '';
-
-        try {
-          const vehicleRef = doc(db, 'vehicles', booking.vehicleId);
-          const vehicleSnap = await getDoc(vehicleRef);
-          if (vehicleSnap.exists()) {
-            const vehicleData = vehicleSnap.data();
-            vehicleName = vehicleData.name ;
-          }
-        } catch (error) {
-          console.warn('User fetch failed', error);
-        }
-
-        return {
-          id: docSnap.id,
-          ...booking,
-        vehicleName,
-        };
-      })
-    );
-
-    setRecentBookings(latestBookingsWithUser);
-  };
-
-  useEffect(() => {
-    fetchDashboardStats();
-  }, []);
+  if (loadingVehicles || loadingStats || loadingRecent) {
+    return <p className="p-6 text-black">Loading dashboard...</p>;
+  }
 
   return (
     <div className="p-6 max-w-6xl mx-auto text-black">
       <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-      <p className="text-gray-500 mb-6">
-        Monitor overall platform performance including total cars, bookings, revenue, and recent activities
-      </p>
+      <p className="text-gray-500 mb-6">Monitor performance and activity</p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <DashboardCard title="Total Cars" value={totalCars} icon={<FaCar />} />
-        <DashboardCard title="Total Bookings" value={totalBookings} icon={<FaClipboardList />} />
-        <DashboardCard title="Pending" value={pendingBookings} icon={<FaExclamationTriangle />} />
-        <DashboardCard title="Confirmed" value={confirmedBookings} icon={<FaClipboardList />} />
+        <DashboardCard title="Total Vehicles" value={totalVehicles} icon={<FaCar />} />
+        <DashboardCard title="Total Bookings" value={stats.total} icon={<FaClipboardList />} />
+        <DashboardCard title="Pending" value={stats.pending} icon={<FaExclamationTriangle />} />
+        <DashboardCard title="Confirmed" value={stats.confirmed} icon={<FaClipboardList />} />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -121,7 +51,7 @@ const AdminDashboard = () => {
         <div className="border rounded-lg p-4 bg-white shadow">
           <h2 className="text-xl font-bold mb-2">Total Revenue</h2>
           <p className="text-sm text-gray-500 mb-4">All-time collected revenue</p>
-          <p className="text-3xl font-bold text-blue-600">₹{totalRevenue}</p>
+          <p className="text-3xl font-bold text-blue-600">₹{stats.revenue}</p>
         </div>
       </div>
     </div>

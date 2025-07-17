@@ -3,19 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { deleteDoc, updateDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/firbaseConfig";
 import toast from "react-hot-toast";
-const BookingCard = ({ booking, index, refetch }) => {
-  const navigate = useNavigate()
 
-    const handleCancel = async (bookingId, vehicleId) => {
+const BookingCard = ({ booking, index, refetch }) => {
+  const navigate = useNavigate();
+
+  const handleCancel = async (bookingId, vehicleId) => {
     const confirm = window.confirm("Are you sure you want to cancel this booking?");
     if (!confirm) return;
 
     try {
       // Step 1: Delete booking
-      await deleteDoc(doc(db, 'bookings', bookingId));
+      await deleteDoc(doc(db, "bookings", bookingId));
 
-      // Step 2: Update vehicle availability
-      await updateDoc(doc(db, 'vehicles', vehicleId), {
+      // Step 2: Mark vehicle as available
+      await updateDoc(doc(db, "vehicles", vehicleId), {
         isAvailable: true,
       });
 
@@ -29,7 +30,7 @@ const BookingCard = ({ booking, index, refetch }) => {
 
   return (
     <div className="border rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm bg-white mt-4">
-      {/* Image & Vehicle Info */}
+      {/* Vehicle Image & Info */}
       <div className="flex items-center gap-4">
         <img
           src={booking.vehicle.image}
@@ -50,14 +51,18 @@ const BookingCard = ({ booking, index, refetch }) => {
           <span className="bg-gray-100 px-3 py-1 rounded-full text-sm font-medium">
             Booking #{index + 1}
           </span>
-          <span className={`${booking.paymentStatus === 'paid' ? 'bg-green-400' : 'bg-red-400'} px-3 py-1 rounded-full text-sm font-medium`}>
+          <span
+            className={`${booking.paymentStatus === "paid" ? "bg-green-400" : "bg-red-400"
+              } px-3 py-1 rounded-full text-sm font-medium`}
+          >
             {booking.paymentStatus}
           </span>
         </div>
 
         <div className="flex items-center text-sm gap-2 text-gray-700">
           <span>
-            Rental Period: {booking.pickupDate.split("T")[0]} to {booking.dropoffDate.split("T")[0]}
+            Rental Period: {booking.pickupDate.split("T")[0]} to{" "}
+            {booking.dropoffDate.split("T")[0]}
           </span>
         </div>
 
@@ -66,32 +71,42 @@ const BookingCard = ({ booking, index, refetch }) => {
         </div>
       </div>
 
-      {/* Price */}
+      {/* Price and Actions */}
       <div className="text-right mt-4 md:mt-0">
         <p className="text-xs text-gray-400">Total Price</p>
         <h3 className="text-xl font-bold text-blue-600">₹{booking.total}</h3>
-        <div className=" flex gap-6 mt-3">
 
-          <button
-          onClick={() =>{
-            handleCancel(booking.id, booking.vehicleId)
-          }}
-          className="bg-red-400 text-white font-bold py-2 px-6  rounded"
-          >Cancel</button>
-          {booking.paymentStatus === 'pending' ? (
-            <button className="px-6 py-2 bg-black text-white rounded transition"
+        <div className="flex flex-col gap-2 mt-3">
+          {/* Cancel Button - only if vehicle not given */}
+          {!booking.given ? (
+            <button
+              onClick={() => handleCancel(booking.id, booking.vehicleId)}
+              className="bg-red-500 text-white font-bold py-2 px-6 rounded"
+            >
+              Cancel
+            </button>
+          ) : (
+            booking.returned ? (
+              <p className="text-green-600 font-semibold text-sm">
+                 Thank you for renting our vehicle!
+              </p>
+            ) : (
+              <p className="text-red-500 text-sm font-semibold">
+                Vehicle already given. Cannot cancel.
+              </p>
+            )
+          )}
+
+          {/* Pay Now Button - only if not paid */}
+          {booking.paymentStatus === "pending" && (
+            <button
+              className="px-6 py-2 bg-black text-white rounded transition"
               onClick={() => navigate(`/check-out/${booking.id}`)}
             >
               Pay Now
             </button>
-          ) : (
-            <></>
           )}
-
-
-
         </div>
-        {/* <p className="text-sm text-gray-500 mt-1">Booked on {booking.createdAt.split("T")[0]}</p> */}
       </div>
     </div>
   );

@@ -18,37 +18,39 @@ const VehiclePage = () => {
     const { setBooking, booking } = useBookingStore();
     const { mutate: createBooking, isPending } = useCreateBooking();
 
-useEffect(() => {
-  if (pickupDate && dropoffDate && vehicle) {
-    const now = new Date();
-    const start = new Date(pickupDate);
-    const end = new Date(dropoffDate);
+    useEffect(() => {
+        if (pickupDate && dropoffDate && vehicle) {
+            const now = new Date();
+            const start = new Date(pickupDate);
+            const end = new Date(dropoffDate);
 
-    if (start < now) {
-      toast.error("Pickup must be in the future");
-      return;
-    }
+            if (start < now) {
+                toast.error("Pickup must be in the future");
+                return;
+            }
 
-    if (end <= start) {
-      toast.error("Drop-off must be after pickup");
-      return;
-    }
+            if (end <= start) {
+                toast.error("Drop-off must be after pickup");
+                return;
+            }
 
-    const durationHours = Math.ceil((end - start) / (1000 * 60 * 60));
-    const total = durationHours * vehicle.price;
+            const durationHours = Math.ceil((end - start) / (1000 * 60 * 60));
+            const total = durationHours * vehicle.price;
 
-    setBooking({
-      userId: auth.currentUser?.uid,
-      vehicleId: id,
-      location: vehicle.location,
-      pickupDate,
-      dropoffDate,
-      duration: durationHours,
-      total,
-      paymentStatus: 'pending'
-    });
-  }
-}, [pickupDate, dropoffDate, vehicle, id, setBooking]);
+            setBooking({
+                userId: auth.currentUser?.uid,
+                vehicleId: id,
+                location: vehicle.location,
+                pickupDate,
+                dropoffDate,
+                duration: durationHours,
+                total,
+                paymentStatus: 'pending',
+                given: false,
+                returned: false,
+            });
+        }
+    }, [pickupDate, dropoffDate, vehicle, id, setBooking]);
     if (isLoading) {
         return (
             <>
@@ -58,19 +60,19 @@ useEffect(() => {
     }
 
     const handleBooking = async () => {
-    if (!booking.location || !booking.pickupDate || !booking.dropoffDate || !booking.total) {
-      return toast.error('Please fill all fields.');
-    }
+        if (!booking.location || !booking.pickupDate || !booking.dropoffDate || !booking.total) {
+            return toast.error('Please fill all fields.');
+        }
 
-    if(!vehicle.isAvailable){
-        return toast.error("Vehicle Allready Booked");
-    }
+        if (!vehicle.isAvailable) {
+            return toast.error("Vehicle Allready Booked");
+        }
 
-    createBooking(booking);
+        createBooking(booking);
 
-  };
+    };
 
-  const nowISO = new Date().toISOString().slice(0, 16); // 'YYYY-MM-DDTHH:MM'
+    const nowISO = new Date().toISOString().slice(0, 16); // 'YYYY-MM-DDTHH:MM'
 
 
     return (
@@ -131,7 +133,7 @@ useEffect(() => {
 
                     {/* Right Section - Booking Form */}
                     <div className=" mt-10 md:mt-0">
-                        <div className="bg-gray-800 shadow-lg rounded-lg p-6 border">
+                        <div className="my-component shadow-lg rounded-lg p-6 border">
                             <h3 className="text-lg font-semibold mb-4">📍 Location</h3>
                             <input className="w-full border px-3 py-2 rounded mb-4" placeholder="Location"
                                 value={vehicle.location}
@@ -139,15 +141,15 @@ useEffect(() => {
                             />
 
                             <label className="block text-sm font-medium">Pick-Up</label>
-                            <input type="datetime-local" className="w-full border px-3 py-2 rounded mb-4"
-                            min={nowISO}
+                            <input type="datetime-local" className="w-full border px-3 py-2 rounded mb-4  "
+                                min={nowISO}
                                 value={pickupDate}
                                 onChange={(e) => setPickupDate(e.target.value)}
                             />
 
                             <label className="block text-sm font-medium">Drop-Off</label>
                             <input type="datetime-local" className="w-full border px-3 py-2 rounded mb-4"
-                            min={pickupDate || nowISO}
+                                min={pickupDate || nowISO}
                                 value={dropoffDate}
                                 onChange={(e) => setDropoffDate(e.target.value)}
                             />
@@ -155,22 +157,22 @@ useEffect(() => {
                             <div className="flex justify-between items-center mb-4">
                                 <span className="">Duration</span>
                                 <span className="font-semibold">
-                                     {booking?.duration ? `${booking.duration} Hours` : '--'}
+                                    {booking?.duration ? `${booking.duration} Hours` : '--'}
                                 </span>
                             </div>
 
                             <div className="flex justify-between items-center mb-6">
                                 <span className="">Total</span>
                                 <span className="text-lg font-bold">
-                                     ₹{booking?.total ? booking.total : '--'}
+                                    ₹{booking?.total ? booking.total : '--'}
                                 </span>
                             </div>
 
-                            <button className="bg-white text-black w-full py-2 rounded  transition"
-                            disabled={isPending}
-                            onClick={handleBooking}
+                            <button className=" btn w-full py-2 rounded  transition"
+                                disabled={isPending}
+                                onClick={handleBooking}
                             >
-                                 {isPending ? 'Booking...' : 'BOOK NOW'}
+                                {isPending ? 'Booking...' : 'BOOK NOW'}
                             </button>
                         </div>
                     </div>

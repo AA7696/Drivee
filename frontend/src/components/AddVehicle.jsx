@@ -3,6 +3,7 @@ import { db } from '../firebase/firbaseConfig';
 import { collection, addDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
+
 const AddVehicle = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -22,6 +23,12 @@ const AddVehicle = () => {
     image: ''
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const[load, setLoad] = useState(false);
+
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -30,18 +37,50 @@ const AddVehicle = () => {
     }));
   };
 
+  const handleImageUpload = async () => {
+    if (!imageFile) return null;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+
+    const data = new FormData();
+    data.append('file', imageFile);
+    data.append('upload_preset', uploadPreset); // Replace with your actual unsigned preset
+    setUploading(true);
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: data
+      });
+      const result = await res.json();
+      return result.secure_url;
+    } catch (err) {
+      console.error('Image upload error:', err);
+      toast.error('Image upload failed');
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoad(true);
 
-    if (!formData.image) {
-      toast.error("Please add an image.");
-      return;
+    let imageUrl = formData.image;
+
+    if (imageFile) {
+      imageUrl = await handleImageUpload();
+      if (!imageUrl) return;
     }
+
+
 
     try {
 
       await addDoc(collection(db, 'vehicles'), {
         ...formData,
+        image: imageUrl,
         createdAt: new Date()
       });
 
@@ -64,6 +103,9 @@ const AddVehicle = () => {
         description: '',
         image: ''
       });
+      setImageFile(null);
+      setLoad(false);
+
     } catch (err) {
       toast.dismiss();
       console.error(err);
@@ -75,10 +117,36 @@ const AddVehicle = () => {
     <form onSubmit={handleSubmit} className="max-w-6xl mx-auto p-6 text-black rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Add New Car</h2>
 
+       {/* Image Upload */}
       <div className="mb-4">
-        <label className="block mb-1">Image URL</label>
-        <input className="border p-2" name='image' type="text" value={formData.image} placeholder='Image URL'  onChange={handleChange} />
+        <label className="block mb-1 font-medium">Upload Image</label>
+        <input className=' border-2 p-3' type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
       </div>
+
+      {/* Optional: Image URL input */}
+      <div className="mb-4">
+        <label className="block mb-1 font-medium">Or paste image URL</label>
+        <input
+          className="border p-2 w-full"
+          name="image"
+          type="text"
+          value={formData.image}
+          placeholder="Image URL (optional)"
+          onChange={handleChange}
+        />
+      </div>
+
+      {/* Preview Image */}
+      {(imageFile || formData.image) && (
+        <div className="mb-4">
+          <p className="font-medium mb-1">Preview:</p>
+          <img
+            src={imageFile ? URL.createObjectURL(imageFile) : formData.image}
+            alt="preview"
+            className="h-40 object-contain"
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="border p-2 rounded" required />
@@ -130,8 +198,10 @@ const AddVehicle = () => {
         required
       />
 
-      <button type="submit" className="bg-black text-white px-6 py-2 rounded hover:bg-gray-900">
-        Add Vehicle
+      <button
+      disabled={load}
+       type="submit" className="bg-black text-white px-6 py-2 rounded hover:bg-gray-900">
+        {load? 'Adding...':'Add Vehicle'}
       </button>
     </form>
   );

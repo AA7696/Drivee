@@ -48,8 +48,6 @@ const RentPage = () => {
           <h1 className="text-4xl lg:text-5xl font-bold text-center">
             Rent A Vehicle Rent Your Freedom
           </h1>
-          {/* Decorative Illustration */}
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('/path-to-hero-bg.svg')] bg-cover bg-no-repeat opacity-30 z-0"></div>
         </div>
 
       </div>

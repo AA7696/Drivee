@@ -1,49 +1,18 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useAllBookingsWithUser } from '../hooks/useAllBookingsWithUser';
 import { db } from '../firebase/firbaseConfig';
-import { collection, getDocs, doc, deleteDoc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import { Trash } from 'lucide-react';
-
-
-const fetchBookings = async () => {
-  const bookingsSnapshot = await getDocs(collection(db, 'bookings'));
-  const bookings = [];
-
-  for (let docSnap of bookingsSnapshot.docs) {
-    const bookingData = docSnap.data();
-    const vehicleRef = doc(db, 'vehicles', bookingData.vehicleId);
-    const vehicleSnap = await getDoc(vehicleRef);
-
-    const userRef = doc(db, 'users', bookingData.userId)
-    const userSnap = await getDoc(userRef);
-
-    bookings.push({
-      id: docSnap.id,
-      ...bookingData,
-      vehicle: vehicleSnap.exists() ? vehicleSnap.data() : null,
-      user: userSnap.exists() ? userSnap.data() : null
-    });
-  }
-
-  return bookings;
-};
 
 const ManageBookings = () => {
-  const { data: bookings, isLoading, refetch } = useQuery({
-    queryKey: ['admin-bookings'],
-    queryFn: fetchBookings,
-  });
+  const { data: bookings, isLoading, refetch } = useAllBookingsWithUser();
 
   const handleCancel = async (bookingId, vehicleId) => {
     const confirm = window.confirm("Are you sure you want to cancel this booking?");
     if (!confirm) return;
 
     try {
-      // Step 1: Delete booking
       await deleteDoc(doc(db, 'bookings', bookingId));
-
-      // Step 2: Update vehicle availability
       await updateDoc(doc(db, 'vehicles', vehicleId), {
         isAvailable: true,
       });
@@ -56,17 +25,33 @@ const ManageBookings = () => {
     }
   };
 
+  const handleUpdate = async (bookingId,vehicleId, updates) => {
+    try {
+      await updateDoc(doc(db, 'bookings', bookingId), updates);
+       if (updates.returned === true && vehicleId) {
+      await updateDoc(doc(db, 'vehicles', vehicleId), {
+        isAvailable: true,
+      });
+    }
+      toast.success("Booking updated.");
+      refetch();
+    } catch (error) {
+      console.error(error);
+      toast.error("Update failed.");
+    }
+  };
+
   if (isLoading) return <p className="p-6">Loading bookings...</p>;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto text-black">
+    <div className="p-6 max-w-7xl mx-auto text-black">
       <h1 className="text-3xl font-bold mb-2">Manage Bookings</h1>
       <p className="text-gray-500 mb-6">
-        Track all customer bookings, approve or cancel requests, and manage booking statuses.
+        Track and manage customer bookings, payments, and vehicle handover.
       </p>
 
       <div className="overflow-x-auto border rounded-lg">
-        <table className="w-full table-auto text-left">
+        <table className="w-full table-auto text-left text-sm">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
               <th className="p-4">Car</th>
@@ -74,16 +59,18 @@ const ManageBookings = () => {
               <th className="p-4">Date Range</th>
               <th className="p-4">Total</th>
               <th className="p-4">Payment</th>
+              <th className="p-4">Given</th>
+              <th className="p-4">Returned</th>
               <th className="p-4">Actions</th>
             </tr>
           </thead>
           <tbody>
             {bookings?.map((b) => (
-              <tr key={b.id} className="border-t">
+              <tr key={b.id} className="border-t hover:bg-gray-50">
                 <td className="p-4 font-medium">{b.vehicle?.name || 'N/A'}</td>
-                <td className="p-4">{b.user?.name || 'N/A'}</td>
+                <td className="p-4">{b.user?.name || b.user?.email || 'Unknown User'}</td>
                 <td className="p-4">
-                  {new Date(b.pickupDate).toLocaleDateString()} -{" "}
+                  {new Date(b.pickupDate).toLocaleDateString()} -{' '}
                   {new Date(b.dropoffDate).toLocaleDateString()}
                 </td>
                 <td className="p-4">₹{b.total}</td>
@@ -92,19 +79,53 @@ const ManageBookings = () => {
                     {b.paymentStatus}
                   </span>
                 </td>
-                <td className="p-4">
-                  <button
-                    onClick={() => handleCancel(b.id, b.vehicleId)}
-                    className="text-red-600 hover:underline text-sm"
-                  >
-                    <Trash />
-                  </button>
+                <td className="p-4">{b.given ? '✅' : '❌'}</td>
+                <td className="p-4">{b.returned ? '✅' : '❌'}</td>
+
+                <td className="p-4 space-y-2 ">
+                  {!b.given && (
+                    <button
+                      onClick={() => handleCancel(b.id, b.vehicleId)}
+                      className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+                    >
+                       Cancel
+                    </button>
+                  )}
+
+                  {b.paymentStatus === 'pending' && (
+                    <button
+                      onClick={() => handleUpdate(b.id,b.vehicleId, { paymentStatus: 'paid' })}
+                      className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+                    >
+                      Mark Paid
+                    </button>
+                  )}
+
+                  {!b.given && (
+                    <button
+                      onClick={() => handleUpdate(b.id,b.vehicleId, { given: true })}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded text-xs"
+                    >
+                      Mark Given
+                    </button>
+                  )}
+
+                  {b.given && !b.returned && (
+                    <button
+                      onClick={() => handleUpdate(b.id,b.vehicleId, { returned: true })}
+                      className="bg-green-600 text-white px-3 py-1 rounded text-xs"
+                    >
+                      Mark Returned
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
             {bookings?.length === 0 && (
               <tr>
-                <td colSpan="5" className="p-6 text-center text-gray-500">No bookings found.</td>
+                <td colSpan="8" className="p-6 text-center text-gray-500">
+                  No bookings found.
+                </td>
               </tr>
             )}
           </tbody>

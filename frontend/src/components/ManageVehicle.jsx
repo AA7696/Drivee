@@ -65,14 +65,14 @@ const ManageVehicle = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-4xl font-bold mb-2 text-black">Manage Cars</h2>
+      <h2 className="text-4xl font-bold mb-2 text-black">Manage Vehicle</h2>
       <p className="text-gray-600 mb-4">Edit or remove listed vehicles below.</p>
 
       <div className="overflow-x-auto">
         <table className="w-full border text-left rounded-lg overflow-hidden">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
-              <th className="p-3">Car</th>
+              <th className="p-3">Vehicle</th>
               <th className="p-3">Type</th>
               <th className="p-3">Price</th>
               <th className="p-3">Status</th>

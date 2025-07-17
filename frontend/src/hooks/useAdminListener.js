@@ -1,4 +1,3 @@
-// src/hooks/useAdminLogin.js
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase/firbaseConfig';
 import { doc, getDoc } from 'firebase/firestore';

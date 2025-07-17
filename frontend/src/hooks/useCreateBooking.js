@@ -1,34 +1,59 @@
-// src/hooks/useCreateBooking.js
 import { useMutation } from '@tanstack/react-query';
 import { db } from '../firebase/firbaseConfig';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
-import  toast  from 'react-hot-toast';
-import { data, useNavigate } from 'react-router-dom';
+import { collection, addDoc, doc, updateDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
+// Create booking + mark vehicle unavailable
 const createBookingAndUpdateVehicle = async (bookingData) => {
-  // Step 1: Create Booking
-  const bookingRef = await addDoc(collection(db, 'bookings'), bookingData);
-
-  // Step 2: Update vehicle availability
   const vehicleRef = doc(db, 'vehicles', bookingData.vehicleId);
-  await updateDoc(vehicleRef, {
-    isAvailable: false
+  const bookingsRef = collection(db, 'bookings');
+
+  const bookingId = await runTransaction(db, async (transaction) => {
+    const vehicleDoc = await transaction.get(vehicleRef);
+
+    if (!vehicleDoc.exists()) {
+      throw new Error('Vehicle does not exist.');
+    }
+
+    const isAvailable = vehicleDoc.data().isAvailable;
+
+    if (!isAvailable) {
+      throw new Error('Vehicle is already booked.');
+    }
+
+    // Add booking
+    const newBookingRef = doc(bookingsRef); // Generate a new booking doc
+    transaction.set(newBookingRef, {
+      ...bookingData,
+      createdAt: serverTimestamp(),
+    });
+
+    // Mark vehicle unavailable
+    transaction.update(vehicleRef, {
+      isAvailable: false,
+    });
+
+    return newBookingRef.id;
   });
 
-  return bookingRef.id;
+  return bookingId;
 };
-
 export const useCreateBooking = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   return useMutation({
     mutationFn: createBookingAndUpdateVehicle,
-    onSuccess: (data) => {
-      toast.success('Booking confirmed ');
-      navigate(`/check-out/${data}`)
+    onSuccess: (bookingId) => {
+      toast.success('Booking confirmed!');
+      navigate(`/check-out/${bookingId}`);
     },
     onError: (error) => {
-      toast.error('Booking failed!');
-      console.error(error);
-    }
+       if (error.message.includes("Vehicle is already booked.")) {
+    toast.error("Oops! Vehicle just got booked by someone else.");
+  } else {
+    toast.error("Booking failed!");
+  }
+    },
   });
 };
