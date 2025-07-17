@@ -8,45 +8,65 @@ Drivee is a modern and user-friendly vehicle rental platform where users can bro
 
 ---
 
-
 ## ✨ Features
 
 ### 🚘 Customer Features
-- User authentication (Google login)
-- Browse vehicles by location, type, fuel, and transmission
-- View detailed vehicle info and availability
-- Book vehicles by selecting pick-up and drop-off date/time
-- Get real-time price calculation
-- Secure payment with Razorpay
-- View booking history
+- 🔐 Google Authentication
+- 🔍 Browse vehicles by location, type, fuel, and transmission
+- 📄 View detailed vehicle information and availability
+- 📅 Book vehicles by selecting pick-up and drop-off date/time
+- 💰 Real-time price calculation based on duration
+- 💳 Secure online payment using Razorpay
+- 📚 View personal booking history
 
 ### 🧑‍💼 Admin/Owner Features
-- Admin login
-- Add new vehicles with specs and image
-- Manage existing cars (edit/delete)
-- Manage bookings (view & cancel)
-- View payment status (paid/pending)
+- 🔐 Admin authentication
+- ➕ Add new vehicles with specifications and images
+- ✏️ Edit or 🗑️ delete existing vehicles
+- 📋 View all bookings (filter by date or vehicle)
+- ❌ Cancel bookings with appropriate checks
+- 💸 View payment status (paid/pending)
 
 ---
 
 ## 🛠 Tech Stack
 
-| Frontend       | Backend         | Database        | Auth & Storage     | Tools & Libs               |
-|----------------|-----------------|-----------------|--------------------|----------------------------|
-| React.js       | Firebase SDK    | Firestore       | Firebase Auth      | Zustand, React Query       |
-| Tailwind CSS   | Vercel Hosting|                 | Firebase Storage   | React Router, Toast, Razorpay |
+| Frontend       | Backend         | Database        | Auth & Storage     | Tools & Libs                        |
+|----------------|-----------------|-----------------|--------------------|-------------------------------------|
+| React.js       | Firebase SDK    | Firestore       | Firebase Auth      | Zustand, React Query, React Router |
+| Tailwind CSS   | Vercel Hosting  |                 | Firebase Storage   | Toast, Razorpay, Cloudinary        |
 
 ---
 
-## 🧑‍💻 How to Use
+## 🔐 Application Architecture & Features
+
+### 🔑 Role-Based Access Control (RBAC)
+- Roles:
+  - **Customer** – can browse, book, and view their own bookings.
+  - **Admin** – can add/manage vehicles, view all bookings, and manage payments.
+- Role stored in Firestore and accessed via Zustand and React Query.
+
+### 🔒 Protected Routes
+- Implemented using custom `PrivateRoute` wrappers.
+- Zustand handles global auth state and user role.
+- Unauthorized access redirects to login or error page.
+
+### ⚙️ Concurrency Control
+- Real-time Firestore database avoids double bookings.
+- Bookings are checked for availability before being confirmed.
+- Admin actions like deleting a vehicle are blocked if there are active bookings.
+- Firebase security rules add an additional layer of protection.
+
+---
+
+## 🧑‍💻 Getting Started Locally
 
 ### 🔧 Local Setup
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/drivee.git
-   cd drivee
-   .env - VITE_RAZORPAY_KEY=rzp_test_fkg78ERTx3otk8
-   npm i
-   npm run dev
+   git clone https://github.com/your-username/drivee.git  
+   cd drivee  
+   npm i  
+   npm run dev  
    
