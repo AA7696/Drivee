@@ -15,7 +15,6 @@ const Navbar = () => {
   const dropdownRef = useRef();
   const { user, logout } = useAuthStore();
 
-  console.log(user.photoURL);
   
 
 
