@@ -1,4 +1,5 @@
 import React from 'react'
+import { useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Vehicle from '../components/Vehicle'
 import { useVehicles } from '../hooks/useVehicles'
@@ -15,6 +16,15 @@ const RentPage = () => {
   const handleFilterChange = (key, value) => {
     setFilters({ [key]: value });
   };
+  
+
+  useEffect(() => {
+    return () => {
+      clearFilters();
+    };
+  }, []);
+
+
 
 
 

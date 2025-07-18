@@ -37,7 +37,7 @@ const MyBooking = () => {
         <h1 className="text-5xl font-bold mb-1 font-sans">My Bookings</h1>
         <p className="text-gray-500 mb-6 mt-5">View and manage your all  bookings</p>
 
-        {bookings.map((booking, index) =>{
+        {bookings?.map((booking, index) =>{
           return(
             <BookingCard key={booking.id} booking={booking} index={index} refetch={refetch} />
           )
