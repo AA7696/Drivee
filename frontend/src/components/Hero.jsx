@@ -5,7 +5,7 @@ import { useFilterStore } from '../store/useFilterStore';
 import bg from '../assets/bg.jpg'
 import useAuthStore from '../store/useAuthStore';
 import { signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider , db } from '../firebase/firbaseConfig.js';
+import { auth, googleProvider, db } from '../firebase/firbaseConfig.js';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
@@ -20,32 +20,32 @@ const HeroSection = () => {
   };
 
   const handleGoogleLogin = async () => {
-  try {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
 
-    // Check if user exists in Firestore
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
+      // Check if user exists in Firestore
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
 
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        uid: user.uid,
-        name: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-        createdAt: new Date().toISOString(),
-        role: 'user' 
-      });
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          createdAt: new Date().toISOString(),
+          role: 'user'
+        });
+      }
+
+      toast.success("Logged in successfully!");
+      navigate('/rent');
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+      console.error('Google login error:', error.message);
     }
-
-    toast.success("Logged in successfully!");
-    navigate('/rent');
-  } catch (error) {
-    toast.error("Login failed. Please try again.");
-    console.error('Google login error:', error.message);
-  }
-};
+  };
 
 
 
@@ -65,9 +65,10 @@ const HeroSection = () => {
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 leading-tight tracking-wide">
           Unlock Endless Driving <br /> With <span className="text-orange-300">Drivee</span>
         </h1>
+
         <p className="text-gray-300 text-sm sm:text-base max-w-2xl mb-6">
-          To contribute to positive change and achieve our sustainability goals with many extraordinary vehicles.
-        </p>
+
+          Drive your self, Enjoy your ride, we aim to revolutionize sustainable mobility through our diverse fleet of exceptional vehicles        </p>
         {
           !user ? (
             <>
