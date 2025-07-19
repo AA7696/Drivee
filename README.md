@@ -1,6 +1,6 @@
 # 🚗 Drivee - Car/Bike Rental Web Application
 
-Drivee is a modern and user-friendly vehicle rental platform where users can browse, book, and pay for cars and bikes online. It includes features for both customers and vehicle owners (admins) to manage bookings, view rental history, and handle fleet operations efficiently.
+Drivee is a modern and user-friendly vehicle rental platform where users can browse, book, and pay for cars and bikes online. It includes features for both customers and admins to manage bookings, view rental history, and handle fleet operations efficiently.
 
 ## 🌐 Live Demo
 
