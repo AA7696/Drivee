@@ -1,4 +1,4 @@
-# 🚗 Drivee - Vehicle Rental Web Application
+# 🚗 Drivee - Car/Bike Rental Web Application
 
 Drivee is a modern and user-friendly vehicle rental platform where users can browse, book, and pay for cars and bikes online. It includes features for both customers and vehicle owners (admins) to manage bookings, view rental history, and handle fleet operations efficiently.
 
@@ -26,6 +26,8 @@ Drivee is a modern and user-friendly vehicle rental platform where users can bro
 - 📋 View all bookings (filter by date or vehicle)
 - ❌ Cancel bookings with appropriate checks
 - 💸 View payment status (paid/pending)
+- Admin login email id - `admin@gmail.com`
+- Admin password - `admin123`
 
 ---
 
