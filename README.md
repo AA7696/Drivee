@@ -36,7 +36,7 @@ Drivee is a modern and user-friendly vehicle rental platform where users can bro
 | Frontend       | Backend         | Database        | Auth & Storage     | Tools & Libs                        |
 |----------------|-----------------|-----------------|--------------------|-------------------------------------|
 | React.js       | Firebase SDK    | Firestore       | Firebase Auth      | Zustand, React Query, React Router |
-| Tailwind CSS   | Vercel Hosting  |                 | Firebase Storage   | Toast, Razorpay, Cloudinary        |
+| Tailwind CSS   | Vercel Hosting  |                 | Cloudinary Storage   | Toast, Razorpay       |
 
 ---
 
